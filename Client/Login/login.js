@@ -12,10 +12,16 @@ function login() {
 		dataType: "json",
 		data: data,
 		success: function(msg){
-            // reset the form
-            $('.modal-content').trigger("reset");
-            // refresh page
-            location.reload();
+			console.log(msg);
+			if (msg.error) {
+				$('#warning').show();
+				$('#warning').find('label').text(msg.error);
+			} else {
+				// reset the form
+				$('.modal-content').trigger("reset");
+				// refresh page
+				location.reload();
+			}
 		}
 	});
 }

@@ -72,4 +72,7 @@ $(function() {
 	$(".deleteAnimate").on('transitionend', function(e){
 		$(e.target).remove();
 	});
+
+	// load navigation bar
+	$("#nav-placeholder").load("./../NavigationBar/navigationBar.html");
 });

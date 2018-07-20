@@ -98,3 +98,7 @@
 .model .hideModal {
     display: none;
 }
+
+.modal #warning {
+    color: red
+}

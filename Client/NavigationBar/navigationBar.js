@@ -1,27 +1,29 @@
-function checkSession(sentence) {
+function checkSession(handler) {
 	$.ajax({
 		type: 'GET',
 		url: 'http://localhost:8080/checkSession',
-		success: function(msg){
-			console.log('already loged in! Your information: ' + JSON.stringify(msg));
-			if (msg.username != undefined) {
-				$(".topnav").find("ul").append(userIconHTML(msg));
-
-			} else {
-				// load login button
-				$(".topnav").find("ul").append(`<li><a onclick="showModal();"><span class="glyphicon glyphicon-user"></span> Login</a></li>`);
-				$("body").append("<div id='login-placeholder'></div>");
-				$("#login-placeholder").load("./../Login/login.html");
-			}
-		}
+		success: handler
 	});
 }
 
-function logout(sentence) {
+function navBarHandler(res) {
+	if (res.username != undefined) {
+		console.log('already loged in!');
+		$(".topnav").find("ul").append(userIconHTML(res));
+	} else {
+		console.log(res.msg);
+		// load login button
+		$(".topnav").find("ul").append(`<li><a onclick="showModal();"><span class="glyphicon glyphicon-user"></span> Login</a></li>`);
+		$("body").append("<div id='login-placeholder'></div>");
+		$("#login-placeholder").load("./../Login/login.html");
+	}
+}
+
+function logout () {
 	$.ajax({
 		type: 'GET',
 		url: 'http://localhost:8080/logout',
-		success: function(msg){
+		success: function(res){
 			location.reload();
 		}
 	});
@@ -34,6 +36,7 @@ function userIconHTML(userInfo) {
 			<span class="glyphicon glyphicon-user"></span> ${userInfo.username}
 		</a>
 		<div class="dropdown-content">
+			<a href="http://localhost:8080/profile"> Profile</a>
 			<a href="#" onclick="logout();"> Log out</a>
 		</div>
 	</li>`
@@ -44,6 +47,6 @@ function showModal() {
 }
 
 $(function() {
-	checkSession();
+	checkSession(navBarHandler);
 });
 
