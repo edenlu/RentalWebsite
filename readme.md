@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Prerequisites:
 1. Have latest NodeJS installed on your machine
 2. Have latest NPM installed on your machine
@@ -8,11 +7,10 @@
 # Steps on how to install:
 1. Turn on XAMPP and open http://localhost/phpmyadmin/
 2. Copy the sql script from createtableScript.sql and execute in phpmyadmin
-
-Now open cmd
-3. cd to project directory
-4. run "npm install"
-5. run "node RentalServer.js"
+3. open cmd
+4. cd to project directory
+5. run "npm install"
+6. run "node RentalServer.js"
 
 Booooom! The rental website is running now!
 
