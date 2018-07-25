@@ -1,20 +1,13 @@
 .searchBar {
 	display: inline-block;
 	text-align: left;
+	height: 50px;
 	width: 500px;
 	font-size: 20px;
 	white-space: normal;
 	word-wrap: break-word;
 	border-radius: 10px;
 	overflow: hidden;
-}
-
-.searchBar .form-group {
-	margin-bottom: 5px
-}
-
-.searchBar .form-group label {
-	color: #ddd;
 }
 
 .searchBar-text {
@@ -26,6 +19,9 @@
 }
 
 .searchBar-button {
+	border: none;
+	width: 40px;
+	height: 100%;
 	background-color: #AAAAAA;
 }
 

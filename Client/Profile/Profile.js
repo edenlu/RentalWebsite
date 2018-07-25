@@ -9,15 +9,26 @@ function checkSession(handler) {
 }
 
 function profileHandler(res) {
-    console.log(JSON.stringify(res))
-    if (res.username) {
-        addEditableElement("username", res.username);
-    }
-    if (res.email) {
-        addEditableElement("email", res.email);
-    }
-    if (res.friendCode) {
-        addEditableElement("friendCode", res.friendCode);
+    console.log(res)
+    if (res.msg == undefined) {
+        let avatarName = res.avatarName;
+        addAvatarElement(res.avatarName);
+        $(".upload").click(function() {
+            uploadProfileIcon();
+        });
+    
+        if (res.username) {
+            addEditableElement("username", res.username);
+        }
+        if (res.email) {
+            addEditableElement("email", res.email);
+        }
+        if (res.friendCode) {
+            addEditableElement("friendCode", res.friendCode);
+        }
+    } else {
+        $('.profile').empty();
+        $('.profile').append('<label style="font-size: 20px;">Requires Login to view profile</label>')
     }
 }
 
@@ -36,12 +47,24 @@ function requestProfileChange(attibuteKey, attribtueValue, handler) {
 	});
 }
 
-function uploadProfileIcon(fileFormData) {
+function uploadProfileIcon() {
+    console.log("uploading imageS")
+    // get data form file input
+    var file = $('input[type=file]')[0].files[0];
+    var formData = new FormData();
+    formData.append('section', 'general');
+    formData.append('action', 'previewImg');
+    formData.append("userIcon", file)
+
 	$.ajax({
         type: 'POST',
-        data: fileFormData,
+        data: formData,
+        contentType: false,
         processData: false,
-        url: 'http://localhost:8080/uploadImage'
+        url: 'http://localhost:8080/uploadUserAvatar',
+		success: function(res){
+			location.reload();
+		}
 	});
 }
 
@@ -57,6 +80,18 @@ function toggleControl(clickEdit) {
     }
 }
 
+function addAvatarElement(avatarName) {
+    let newHtml = `
+    <div class='icon'>
+        <div class="control">
+            <img src="${"http://localhost:8080/images/" + avatarName}" id="avatar">
+            <input type="file" id="filechooser" accept=".jpg, .jpeg, .png">
+            <button type="button" class="btn btn-success upload">Upload</button>
+        </div>
+    </div>`;
+    $(".profile").prepend(newHtml);
+}
+
 function addEditableElement(attribtueKey, attribtueValue) {
     let newHtml = 
     `
@@ -68,12 +103,12 @@ function addEditableElement(attribtueKey, attribtueValue) {
                 <button type="button" class="btn btn-danger cancel">Cancel</button>
         </div>
         <div class="content">${attribtueValue}</div>
+        <hr>
     </div>
     `;
     $(".profile .infoList").append(newHtml).each(function() {
         registerAttributeElement(attribtueKey, attribtueValue);
     });
-
 }
 
 function registerAttributeElement(attribtueKey, attribtueValue) {
@@ -139,13 +174,4 @@ $(function() {
 	// load navigation bar
 	$("#nav-placeholder").load("./../NavigationBar/navigationBar.html");
     checkSession(profileHandler);
-    
-    $(".upload").click(function() {
-        // get data form file input
-        let king = 123;
-        var blobFile = document.getElementById('filechooser').files[0];
-        var formData = new FormData();
-        formData.append("userIcon", blobFile)
-        uploadProfileIcon(formData);
-    });
 });

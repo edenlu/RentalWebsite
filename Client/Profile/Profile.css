@@ -1,10 +1,14 @@
 html, body {
     background-color: #aaa !important;
+}
+
+.profileContainer {
     text-align: center;
 }
 
 .profile {
     background: #ddd;
+    border-radius: 5px;
     display: inline-block;
     width: 50%;
     padding: 10px;
@@ -15,6 +19,10 @@ html, body {
 }
 .profile .icon {
     text-align: center;
+}
+
+.profile .icon * {
+    margin: 5px;
 }
 
 .profile img {
@@ -60,6 +68,7 @@ html, body {
 
 .profile .icon .control {
     max-width: 200px;
+    display: inline-block;
 }
 .profile .infoList .attribute .control {
     float: right;

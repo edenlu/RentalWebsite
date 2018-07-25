@@ -3,7 +3,8 @@ CREATE TABLE IF NOT EXISTS account (
 	username	VARCHAR(64) NOT NULL,
 	email 		VARCHAR(64) NOT NULL,
 	password	VARCHAR(128) NOT NULL,
-	friendCode	VARCHAR(123) NOT NULL,
+	friendCode	VARCHAR(128) NOT NULL,
+    avatarName  VARCHAR(128),
 	PRIMARY KEY (aid),
 	UNIQUE (email)
 );
@@ -107,6 +108,6 @@ CREATE TABLE IF NOT EXISTS Comment(
 		ON DELETE NO ACTION
 );
 
-insert into account values(111111, 'edenlu','zla73@sfu.ca','123', 'HarryPotter');
+insert into account values(111111, 'edenlu','zla73@sfu.ca','123', 'HarryPotter', null);
 insert into administer values(111111);
 

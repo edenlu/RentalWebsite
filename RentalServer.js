@@ -7,7 +7,15 @@ var cookieParser = require('cookie-parser');
 var session = require('express-session');
 // File uploading module
 var multer = require('multer');
-var upload = multer({ dest: './upload/' });
+var storage = multer.diskStorage({
+	destination: function (req, file, cb) {
+	  cb(null, 'public/images')
+	},
+	filename: function (req, file, cb) {
+	  cb(null, "Image" + Date.now() + file.originalname)
+	}
+  })
+var upload = multer({ storage: storage});
 
 // App inform
 var app = express();
@@ -34,17 +42,20 @@ app.use(session({
 }));
 
 // Send all static files like images or css files to browser when requested
-app.use(express.static('Client'))
+app.use(express.static('Client'));
+app.use(express.static('public'));
 
 // initialize body-parser to parse incoming parameters requests to req.body
 // parse json object
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // initialize cookie-parser to allow us access the cookies stored in the browser. 
 app.use(cookieParser());
 
-app.use(upload.any());
+// app.use(upload.any());
+// make public
+
 
 /********************************
 *			   API				*
@@ -98,11 +109,14 @@ app.get('/logout', (req, res) => {
 // Check user session to see if already login
 app.get("/checkSession", (req, res) => {
     if (req.session.user && req.cookies.user_sid) {
-		let sql = `SELECT * FROM account where aid = '${req.session.user}'`;
+		let sql =  `SELECT username, email, friendCode, avatarName FROM account where aid = '${req.session.user}'`;
 		con.query(sql, function (err, result) {
 			if (err) throw err;
 			if (result.length === 1) {
 				// If user exist then set to session
+				if (!(result[0].avatarName)) {
+					result[0].avatarName = 'default.png';
+				}
 				res.send(200, result[0]);
 			}
 		});
@@ -110,8 +124,6 @@ app.get("/checkSession", (req, res) => {
 		res.send(200, {msg: "Not login yet!"});
     }
 });
-
-
 
 // Profile
 app.get("/profile", (req, res) => {
@@ -133,9 +145,15 @@ app.post("/changeProfile", (req, res) => {
 });
 
 // Upload Image
-app.post("/uploadImage", (req, res) => {
-	console.log(req.files);
-	res.send('Upload Done!');
+app.post("/uploadUserAvatar", upload.single('userIcon'), (req, res) => {
+	if (req.session.user && req.cookies.user_sid) {
+		let sql = `UPDATE account set avatarName = '${req.file.filename}'where aid = '${req.session.user}'`;
+		con.query(sql, function (err, result) {
+			if (err) throw err;
+			res.send(200, result[0]);
+		});
+    }
+	res.send(200);
 });
 
 // Register
