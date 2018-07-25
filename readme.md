@@ -4,6 +4,9 @@
 3. Install XAMPP and setup your database
 4. Have Git Bash installed
 
+# Dowload the code
+git clone https://github.com/edenlu/RentalWebsite.git
+
 # Steps on how to install:
 1. Turn on XAMPP and open http://localhost/phpmyadmin/
 2. Copy the sql script from createtableScript.sql and execute in phpmyadmin
