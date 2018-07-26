@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS account (
-	aid		INTEGER,
+	aid		    BIGINT,
 	username	VARCHAR(64) NOT NULL,
 	email 		VARCHAR(64) NOT NULL,
 	password	VARCHAR(128) NOT NULL,
@@ -10,14 +10,14 @@ CREATE TABLE IF NOT EXISTS account (
 );
 
 CREATE TABLE IF NOT EXISTS administer (
-	aid			INTEGER,
+	aid			BIGINT,
 	PRIMARY KEY (aid),
 	FOREIGN KEY (aid) REFERENCES account (aid)
 );
 
 CREATE TABLE IF NOT EXISTS friends (
-	friendIDA	INTEGER NOT NULL,
-	friendIDB 	INTEGER NOT NULL,
+	friendIDA	BIGINT NOT NULL,
+	friendIDB 	BIGINT NOT NULL,
 	PRIMARY KEY (friendIDA, friendIDB),
 	FOREIGN KEY (friendIDA) REFERENCES account (aid),
 	FOREIGN KEY (friendIDA) REFERENCES account (aid)
@@ -25,19 +25,19 @@ CREATE TABLE IF NOT EXISTS friends (
 );
 
 CREATE TABLE IF NOT EXISTS preference(
-	preID				INTEGER,
+	preID				BIGINT,
 	preferPrice			INTEGER DEFAULT NULL,
 	preferBedroomNumber	INTEGER DEFAULT NULL,
 	preferLocation		VARCHAR(50) DEFAULT NULL,
-	aid					INTEGER,
+	aid					BIGINT,
 	PRIMARY KEY (preID),
 	FOREIGN KEY (aid) REFERENCES account (aid) 
 		ON DELETE NO ACTION
 );
 
 CREATE TABLE IF NOT EXISTS Notification(
-	aid			INTEGER NOT NULL,
-	preID		INTEGER NOT NULL,
+	aid			BIGINT NOT NULL,
+	preID		BIGINT NOT NULL,
 	PRIMARY KEY (aid, preID),
 	FOREIGN KEY (aid) REFERENCES account (aid)
 		ON DELETE NO ACTION,
@@ -46,18 +46,18 @@ CREATE TABLE IF NOT EXISTS Notification(
 );
 
 CREATE TABLE IF NOT EXISTS Post(
-	pid				INTEGER,
-	aid				INTEGER NOT NULL,
+	pid				BIGINT,
+	aid				BIGINT NOT NULL,
 	postContent		VARCHAR(256) DEFAULT NULL,
 	postTitle		VARCHAR(128) NOT NULL,
-	postDate		date,
+	postDate		VARCHAR(128) NOT NULL,
 	PRIMARY KEY(pid),	
 	FOREIGN KEY (aid) REFERENCES account (aid) 
 		ON DELETE NO ACTION
 );
 
 CREATE TABLE IF NOT EXISTS RentInRequest(
-	pid					INTEGER,
+	pid					BIGINT,
 	LowerBoundPrice		INTEGER NOT NULL,
 	UpperBoundPrice		INTEGER NOT NULL,
 	preferBedroomNumber	INTEGER NOT NULL,
@@ -67,28 +67,21 @@ CREATE TABLE IF NOT EXISTS RentInRequest(
 		ON DELETE NO ACTION
 );
 
-CREATE TABLE IF NOT EXISTS RentUnit(
-	address		VARCHAR(128),
+CREATE TABLE IF NOT EXISTS RentOutPost(
+	pid			    BIGINT,
+	address		    VARCHAR(128),
 	city			VARCHAR(128) NOT NULL,
 	province		VARCHAR(128) NOT NULL,
-	size			VARCHAR(20) DEFAULT NULL,
-	price			INTEGER NOT NULL,
-	PRIMARY KEY(address)
-);
-
-CREATE TABLE IF NOT EXISTS RentOutPost(
-	pid			INTEGER,
-	address		VARCHAR(128) NOT NULL,
-	PRIMARY KEY(pid),
+	size			INTEGER DEFAULT NULL,
+    price			INTEGER NOT NULL,
+	PRIMARY KEY (pid),
 	FOREIGN KEY (pid) REFERENCES Post(pid) 
-		ON DELETE NO ACTION,
-	FOREIGN KEY (address) REFERENCES RentUnit(address) 
-		ON UPDATE CASCADE
+		ON DELETE NO ACTION
 );
 
 CREATE TABLE IF NOT EXISTS Image(
-	iid			INTEGER,
-	pid			INTEGER NOT NULL,
+	iid			BIGINT,
+	pid			BIGINT NOT NULL,
 	iname			VARCHAR(30) NOT NULL,
 	PRIMARY KEY(iid),
 	FOREIGN KEY (pid) REFERENCES Post(pid) 
@@ -96,18 +89,27 @@ CREATE TABLE IF NOT EXISTS Image(
 );
 
 CREATE TABLE IF NOT EXISTS Comment(
-	cid 				INTEGER,
-	pid					INTEGER,
-	aid					INTEGER NOT NULL,
-	commentDate		VARCHAR(128) NOT NULL,
+	cid 				BIGINT,
+	pid					BIGINT,
+	aid					BIGINT,
+	commentDate		    VARCHAR(128) NOT NULL,
 	commentContent		VARCHAR(256) NOT NULL,
-	PRIMARY KEY (pid,aid),
+	PRIMARY KEY (cid,pid,aid),
 	FOREIGN KEY (pid) REFERENCES Post(pid)
 		ON DELETE NO ACTION,
-	FOREIGN KEY (pid) REFERENCES account(aid)
+	FOREIGN KEY (aid) REFERENCES account(aid)
 		ON DELETE NO ACTION
 );
 
 insert into account values(111111, 'edenlu','zla73@sfu.ca','123', 'HarryPotter', null);
 insert into administer values(111111);
+
+insert into post values (1532590474788, 111111, 'You buy then you buy, fuck off other wise', 'My first house', '7/26/2018, 12:34:34 AM');
+insert into post values (1532590556905, 111111, 'do you want to taste heaven?', 'Hey can someone rent my townhouse?', '7/26/2018, 12:35:56 AM');
+insert into post values (1532590635177, 111111, 'Cheap and nice, me the landlord is an Professional Engineer', 'Super nice room at Burnaby!', '7/26/2018, 12:37:15 AM');
+
+insert into RentOutPost values (1532590474788, '1111 Kingdom', 'richmond', 'bc', 3, 2000);
+insert into RentOutPost values (1532590556905, '123 Heaven rd', 'richmond', 'bc', 2, 1000);
+insert into RentOutPost values (1532590635177, '999 Garden City', 'burnaby', 'bc', 1, 555);
+
 

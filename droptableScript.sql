@@ -1,5 +1,4 @@
 drop table RentOutPost;
-drop table RentUnit;
 drop table RentInRequest;
 drop table Notification;
 drop table preference;

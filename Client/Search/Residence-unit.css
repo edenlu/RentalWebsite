@@ -1,5 +1,5 @@
 body {
-	background-image: url("background.jpg");
+	background-image: url("http://localhost:8080/images/background.jpg");
 }
 
 div.residence-list ul {
@@ -73,5 +73,5 @@ div.residence-list ul {
 }
 
 ::-webkit-scrollbar {
-	display: none;	//Hide scroll bar
+	display: none;
 }

@@ -53,8 +53,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // initialize cookie-parser to allow us access the cookies stored in the browser. 
 app.use(cookieParser());
 
-// app.use(upload.any());
-// make public
+//ejs
+app.set("view engine", "ejs");
 
 
 /********************************
@@ -66,8 +66,32 @@ app.get("/search", (req, res) => {
 });
 
 app.post("/search", (req, res) => {
-	let supek = 1;
-	/*TODO*/
+	let data = req.body;
+	let type = 'rentoutpost';
+	let orderBy = '';
+	let sql =  `select * from post p, rentoutpost r where p.pid = r.pid`;
+	if (data.city) {
+		sql += ` and r.city = "${data.city.toLowerCase()}"`;
+	}
+	if (data.size && !isNaN(data.size)) {
+		sql += ` and r.size <= ${data.size}`;
+		orderBy = 'r.size';
+	}
+	if (data.price && !isNaN(data.price)) {
+		sql += ` and r.price <= ${data.price}`;
+		orderBy = 'r.price';
+	}
+	if (orderBy) {
+		sql += ` order by ${orderBy}`;
+	}
+
+	// limit to top 10
+	sql += ' limit 10';
+	con.query(sql, function (err, result) {
+		if (err) throw err;
+		res.send(result);
+	});
+
 });
 
 // Login
@@ -157,8 +181,136 @@ app.post("/uploadUserAvatar", upload.single('userIcon'), (req, res) => {
 });
 
 // Register
+app.get("/registeration", (req, res) => {
+	res.sendFile(__dirname + '/Client/Registeration/Registeration.html');
+});
+
+// Register
 app.post("/register", (req, res) => {
-	/*TODO*/
+	let user = req.body;
+	let data={error:""}
+	let sql=`SELECT * FROM account where username = '${user.username}'`;
+	con.query(sql,function(err,result){
+		if (result.length === 1){
+			data.error="user already exist"
+			res.send(200, data);			
+		} else {
+			sql=`SELECT * FROM account where email = '${user.email}'`;
+			con.query(sql,function(err,result){
+				if(result.length===1){
+					data.error="E-mail already been used"
+					res.send(200, data);	
+				} else {
+                    sql=`SELECT aid FROM account`;
+                    con.query(sql,function(err,result){
+                        let rnumber = Date.now();
+                        while (result.indexOf(rnumber) != -1) {
+                            rnumber = Date.now();
+                        }
+                        sql = `insert into account values('${rnumber}','${user.username}','${user.email}','${user.password}','', null)`;
+                        con.query(sql, function (err, result) {
+							if (err) throw err;
+							// Keep registered user login
+							req.session.user = rnumber;
+							res.send({redirect: '/search'});
+                        });
+					});
+				}
+			});
+		}
+	});
+});
+
+app.get("/createPost", (req, res) => {
+	res.sendFile(__dirname + '/Client/CreatePost/CreatePost.html');
+});
+
+app.post("/createPost", (req, res) => {
+	if (!req.session.user || !req.cookies.user_sid) {
+		res.send(400, "Not login yet");
+		return;
+	}
+	else {
+		let pid = Date.now();
+		let aid = req.session.user;
+		let postDate = new Date().toLocaleString();
+		let postInfo = req.body;
+		let sql_post = `INSERT INTO post VALUES (${pid}, ${aid}, '${postInfo.data.postContent}', '${postInfo.data.title}', '${postDate}')`;
+		con.query(sql_post, function(err, result){
+			if (err) throw err;
+			if (postInfo.type == "rentIn") {
+				let sql_rentIn = `INSERT INTO rentinrequest VALUES (${pid},${postInfo.data.LowerBoundPrice},${postInfo.data.UpperBoundPrice},${postInfo.data.preferBedroomNumber})`;
+				con.query(sql_rentIn, function(err, result) {
+					if (err) throw err;
+					res.send(200, "ok");
+				});
+			} else {
+				let sql_rentOut = `INSERT INTO rentoutpost VALUES (${pid},'${postInfo.data.address}', '${postInfo.data.city.toLowerCase()}', '${postInfo.data.province.toLowerCase()}', '${postInfo.data.size}', ${postInfo.data.price})`;
+				con.query(sql_rentOut, function(err, result){
+					if (err) throw err;
+					res.send(200, "ok");
+				});
+			}
+		});
+	}
+});
+
+
+app.get("/posts/:id", (req, res) => {
+	let pid = req.params.id;
+	let sql = `SELECT * FROM Post where pid = '${pid}'`;
+  
+	con.query(sql, function(err, post) {
+		if (err) throw err;
+		let aid = post[0].aid;
+		sql = `SELECT username FROM Account WHERE aid = '${aid}'`;
+		con.query(sql, function(err, username) {
+			if (err) throw err;
+			sql = `SELECT * FROM Comment WHERE pid = '${pid}' ORDER BY commentDate`;
+			con.query(sql, function(err, comments) {
+				if (err) throw err;
+				sql = `SELECT * FROM RentOutPost WHERE pid = '${pid}'`;
+				con.query(sql, function(err, RentOutPost) {
+					console.log(RentOutPost[0]);
+					if (err) throw err;
+					res.render("post", {
+						post: post[0],
+						username: username[0],
+						comments: comments,
+						RentOutPost: RentOutPost
+					});
+				});
+			});
+		});
+	});
+});
+  
+app.post("/posts/:id", (req, res) => {
+	if (!req.session.user || !req.cookies.user_sid) {
+		res.send(400, {error: "Not login yet!"});
+		return;
+	}
+
+	let cid = Date.now();
+	let timestamp = new Date();
+	let date = timestamp.toLocaleString();
+	let pid = req.params.id;
+	let aid = req.session.user;
+	let commentContent = req.body.commentContent;
+
+	let sql = `INSERT INTO Comment VALUES ('${cid}', '${pid}', '${aid}', '${date}', '${commentContent}')`;
+	con.query(sql, function(err, post) {
+		let data = {
+			error: "",
+			success: ""
+		};
+		if (err) {
+			data.error = err;
+		} else {
+			data.success = "success";
+			res.send(200, data);
+		}
+	});
 });
 
 // Listen to the port 8080 (infinite loop)

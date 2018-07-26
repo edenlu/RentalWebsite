@@ -1,26 +1,50 @@
-function search(sentence) {
+function search() {
 	/*parse the sentence here*/
+	let price = parseInt($('#price_input').val());
+	let city = $('#city_input').val();
+	let room_num = parseInt($('#room_num_input').val());
+
 	let data = {
-		sentence: sentence
+		price: price,
+		city: city,
+		size: room_num
 	};
-	
+
 	$.ajax({
 		type: 'POST',
 		url: 'http://localhost:8080/search',
 		dataType: "json",
 		data: data,
-		success: function(msg){
-			alert('wow' + msg);
+		success: function(res){
+			if (res) {
+				// clean the table first
+				cleanResidenceList();
+
+				// Generate the new table
+				res.forEach(post => {
+					context = {
+						title: post.postTitle,
+						thumbnailSrc: "http://localhost:8080/images/question-mark.jpg",
+						postlink: `http://localhost:8080/posts/${post.pid}`,
+						price: post.price,
+						size: post.size
+					};
+					createResidenceUnit(context);
+				});
+			}
 		}
 	});
 }
 
 function newResidenceUnitHtml(context) {
-	let title = context.title;
-	let price = context.price;
-	let thumbnailSrc = context.thumbnailSrc;
-	let postLink = context.postlink;
-	
+	let priceTag = '', sizeTag = '';
+	if (context.size) {
+		sizeTag = `<div>Size: ${context.size} room</div>`;
+	}
+	if (context.price) {
+		priceTag = `<div>Price: ${context.price}$</div>`;
+	}
+
 	let newElementHtml = `
 	<li class="residence-unit">
 		<a href="${context.postlink}" class="residence-unit-link">
@@ -30,32 +54,23 @@ function newResidenceUnitHtml(context) {
 			<div class="residence-unit-thumbnail">
 				<img class="residence-unit-thumbnail-image" src="${context.thumbnailSrc}">
 			</div>
-			<div class="residence-unit-detail"></div>
+			<div class="residence-unit-detail">${sizeTag}${priceTag}</div>
 		</a>
 	</li>`;
 	return newElementHtml;
 }
 
 function createResidenceUnit(context) {
-	context = {
-		title: "Hahaha",
-		thumbnailSrc: "image1.png",
-		postlink: "https://www.google.ca"
-	};
-	$(".residence-list").find("ul").append(newResidenceUnitHtml(context));
+	$(".residence-list ul").append(newResidenceUnitHtml(context));
 }
 
 function cleanResidenceList() {
-	$(".residence-list").find("ul").find("li").map(function(index, obj) {
-		$(obj).animate({
-			height: "0px"
-		}, 200, function() {
-			obj.remove();
-		})
+	$(".residence-list ul li").map(function(index, obj) {
+		obj.remove();
 	});
 	
 	return new Promise((resolve, reject) => {
-		if ($(".residence-list").find("ul").find("li").length == 0) {
+		if ($(".residence-list ul li").length == 0) {
 			resolve("All elements removed");
 		}
 	})
@@ -66,7 +81,7 @@ function cleanResidenceList() {
 ************************/
 $(function() {
 	$("#searchButton").click(function() {
-		createResidenceUnit();
+		search();
 	});
 	
 	$(".deleteAnimate").on('transitionend', function(e){
@@ -75,4 +90,6 @@ $(function() {
 
 	// load navigation bar
 	$("#nav-placeholder").load("./../NavigationBar/navigationBar.html");
+	// Search without any parameters
+	search()
 });
