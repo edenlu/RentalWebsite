@@ -203,7 +203,7 @@ app.post("/changeProfile", (req, res) => {
 });
 
 // Upload Image
-app.post("/uploadUserAvatar", upload.single('userIcon'), (req, res) => {
+app.post("/uploadUserAvatar", upload.array('userIcon'), (req, res) => {
 	if (req.session.user && req.cookies.user_sid) {
 		let sql = `UPDATE account set avatarName = '${req.file.filename}'where aid = '${req.session.user}'`;
 		con.query(sql, function (err, result) {
@@ -241,7 +241,7 @@ app.post("/register", (req, res) => {
                         while (result.indexOf(rnumber) != -1) {
                             rnumber = Date.now();
                         }
-                        sql = `insert into account values('${rnumber}','${user.username}','${user.email}','${user.password}','', null)`;
+                        sql = `insert into account values('${rnumber}','${user.username}','${user.email}','${user.password}','${Date.now().toString()}', null)`;
                         con.query(sql, function (err, result) {
 							if (err) throw err;
 							// Keep registered user login

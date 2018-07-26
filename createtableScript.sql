@@ -20,28 +20,7 @@ CREATE TABLE IF NOT EXISTS friends (
 	friendIDB 	BIGINT NOT NULL,
 	PRIMARY KEY (friendIDA, friendIDB),
 	FOREIGN KEY (friendIDA) REFERENCES account (aid),
-	FOREIGN KEY (friendIDA) REFERENCES account (aid)
-		ON DELETE NO ACTION
-);
-
-CREATE TABLE IF NOT EXISTS preference(
-	preID				BIGINT,
-	preferPrice			INTEGER DEFAULT NULL,
-	preferBedroomNumber	INTEGER DEFAULT NULL,
-	preferLocation		VARCHAR(50) DEFAULT NULL,
-	aid					BIGINT,
-	PRIMARY KEY (preID),
-	FOREIGN KEY (aid) REFERENCES account (aid) 
-		ON DELETE NO ACTION
-);
-
-CREATE TABLE IF NOT EXISTS Notification(
-	aid			BIGINT NOT NULL,
-	preID		BIGINT NOT NULL,
-	PRIMARY KEY (aid, preID),
-	FOREIGN KEY (aid) REFERENCES account (aid)
-		ON DELETE NO ACTION,
-	FOREIGN KEY (preID) REFERENCES  preference(preID)
+	FOREIGN KEY (friendIDB) REFERENCES account (aid)
 		ON DELETE NO ACTION
 );
 
@@ -80,8 +59,8 @@ CREATE TABLE IF NOT EXISTS RentOutPost(
 );
 
 CREATE TABLE IF NOT EXISTS Image(
-	iid			BIGINT,
-	pid			BIGINT NOT NULL,
+	iid			    BIGINT,
+	pid			    BIGINT NOT NULL,
 	iname			VARCHAR(30) NOT NULL,
 	PRIMARY KEY(iid),
 	FOREIGN KEY (pid) REFERENCES Post(pid) 

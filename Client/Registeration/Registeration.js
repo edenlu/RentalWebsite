@@ -5,6 +5,12 @@ function register() {
     let password = $("input[name=password]").val();
 	let email = $("input[name=email]").val();
 
+	if (!username || !password || !email) {
+		$('#warning').show();
+		$('#warning').find('label').text("please enter required fields!");
+		return;
+	}
+
     let data = {
         "username": username,
         "password": password,
