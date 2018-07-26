@@ -32,12 +32,14 @@ function logout () {
 }
 
 function userIconHTML(userInfo) {
+	let adminTag = userInfo.isAdmin ? '<a href="http://localhost:8080/admin"> Administer</a>' : '';
 	// load user icon and name
 	return `<li class="dropdown">
 		<a href="#" class="dropbtn">
 			<span class="glyphicon glyphicon-user"></span> ${userInfo.username}
 		</a>
 		<div class="dropdown-content">
+			${adminTag}
 			<a href="http://localhost:8080/profile"> Profile</a>
 			<a href="#" onclick="logout();"> Log out</a>
 		</div>

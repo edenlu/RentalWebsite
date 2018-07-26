@@ -37,7 +37,7 @@ app.use(session({
     key: 'user_sid',
     secret: 'this-is-secret-token',
     cookie: {
-        expires: 600000
+        expires: 60*60*1000
     }
 }));
 
@@ -82,7 +82,7 @@ app.post("/search", (req, res) => {
 		orderBy = 'r.price';
 	}
 	if (orderBy) {
-		sql += ` order by ${orderBy}`;
+		sql += ` order by ${orderBy} DESC`;
 	}
 
 	// limit to top 10
@@ -91,7 +91,6 @@ app.post("/search", (req, res) => {
 		if (err) throw err;
 		res.send(result);
 	});
-
 });
 
 // Login
@@ -134,14 +133,19 @@ app.get('/logout', (req, res) => {
 app.get("/checkSession", (req, res) => {
     if (req.session.user && req.cookies.user_sid) {
 		let sql =  `SELECT username, email, friendCode, avatarName FROM account where aid = '${req.session.user}'`;
-		con.query(sql, function (err, result) {
+		con.query(sql, function (err, data) {
 			if (err) throw err;
-			if (result.length === 1) {
+			if (data.length === 1) {
 				// If user exist then set to session
-				if (!(result[0].avatarName)) {
-					result[0].avatarName = 'default.png';
+				if (!(data[0].avatarName)) {
+					data[0].avatarName = 'default.png';
 				}
-				res.send(200, result[0]);
+				sql =  `SELECT * FROM administer where aid = '${req.session.user}'`;
+				con.query(sql, function (err, result) {
+					if (err) throw err;
+					if (result.length === 1) data[0].isAdmin = true;
+					res.send(200, data[0]);
+				});
 			}
 		});
     } else {
@@ -152,6 +156,36 @@ app.get("/checkSession", (req, res) => {
 // Profile
 app.get("/profile", (req, res) => {
 	res.sendFile(__dirname + '/Client/Profile/Profile.html');
+});
+
+// Admin page
+app.get("/admin", (req, res) => {
+	res.sendFile(__dirname + '/Client/Administer/Administer.html');
+});
+
+// Admin execute query
+app.post("/admin", (req, res) => {
+	if (!req.session.user || !req.cookies.user_sid) {
+		res.send(200, 'not login yet!');
+		return;
+	}
+
+	let checkAdminSql = `select * from administer where aid = '${req.session.user}'`;
+	con.query(checkAdminSql, function (err, administer) {
+		if (err) throw err;
+		if (administer.length !== 1) {
+			res.send(200, 'You are not an administer!');
+			return;
+		}
+
+		let sql = req.body.sql;
+		con.query(sql, function (err, result) {
+			if (err)
+				res.send(200, err)
+			else
+				res.send(200, result);
+		});
+	});
 });
 
 // Change profile
