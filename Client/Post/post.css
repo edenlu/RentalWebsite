@@ -1,5 +1,5 @@
 body {
-  background-image: url("../Search/background.jpg");
+  background-image: url("http://localhost:8080/images/background.jpg");
 }
 #warning {
   color: red;
