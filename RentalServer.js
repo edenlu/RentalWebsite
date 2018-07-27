@@ -89,7 +89,20 @@ app.post("/search", (req, res) => {
 	sql += ' limit 10';
 	con.query(sql, function (err, result) {
 		if (err) throw err;
-		res.send(result);
+
+		// Default set to question-mark image
+		result.forEach(item => item.iname = "question-mark.jpg");
+
+		// Get thumbnail for the post
+		sql =  `select p.pid, i.iid, i.iname from post p, rentoutpost r, image i where p.pid = r.pid and i.pid = p.pid`;
+		con.query(sql, function (err, imageInfo) {
+			if (err) throw err;
+			imageInfo.forEach(function(singleImageInfo) {
+				let matchPost = result.find((item) => item.pid == singleImageInfo.pid);
+				matchPost.iname = singleImageInfo.iname;
+			});
+			res.send(result);
+		});
 	});
 });
 
@@ -332,36 +345,46 @@ app.get("/createPost", (req, res) => {
 	res.sendFile(__dirname + '/Client/CreatePost/CreatePost.html');
 });
 
+var posId;
 app.post("/createPost", (req, res) => {
 	if (!req.session.user || !req.cookies.user_sid) {
 		res.send(400, "Not login yet");
 		return;
-	}
-	else {
-		let pid = Date.now();
+	} else {
+		posId = Date.now();
 		let aid = req.session.user;
 		let postDate = new Date().toLocaleString();
 		let postInfo = req.body;
-		let sql_post = `INSERT INTO post VALUES (${pid}, ${aid}, '${postInfo.data.postContent}', '${postInfo.data.title}', '${postDate}')`;
+		let sql_post = `INSERT INTO post VALUES (${posId}, ${aid}, '${postInfo.data.postContent}', '${postInfo.data.title}', '${postDate}')`;
 		con.query(sql_post, function(err, result){
 			if (err) throw err;
 			if (postInfo.type == "rentIn") {
-				let sql_rentIn = `INSERT INTO rentinrequest VALUES (${pid},${postInfo.data.LowerBoundPrice},${postInfo.data.UpperBoundPrice},${postInfo.data.preferBedroomNumber})`;
+				let sql_rentIn = `INSERT INTO rentinrequest VALUES (${posId},${postInfo.data.LowerBoundPrice},${postInfo.data.UpperBoundPrice},${postInfo.data.preferBedroomNumber})`;
 				con.query(sql_rentIn, function(err, result) {
 					if (err) throw err;
-					res.send(200, "ok");
+					res.send(200, {pid:posId});
 				});
 			} else {
-				let sql_rentOut = `INSERT INTO rentoutpost VALUES (${pid},'${postInfo.data.address}', '${postInfo.data.city.toLowerCase()}', '${postInfo.data.province.toLowerCase()}', '${postInfo.data.size}', ${postInfo.data.price})`;
+				let sql_rentOut = `INSERT INTO rentoutpost VALUES (${posId},'${postInfo.data.address}', '${postInfo.data.city.toLowerCase()}', '${postInfo.data.province.toLowerCase()}', '${postInfo.data.size}', ${postInfo.data.price})`;
 				con.query(sql_rentOut, function(err, result){
 					if (err) throw err;
-					res.send(200, "ok");
+					res.send(200, {pid:posId});
 				});
 			}
 		});
 	}
 });
 
+app.post("/upload/filesList", upload.single("img"), (req, res) => {
+	if (req.session.user && req.cookies.user_sid) {
+		let iid = Date.now();
+		let sql_img = `INSERT INTO image VALUES (${iid},${posId},'${req.file.filename}')`;
+		con.query(sql_img, function(err, result) {
+			if (err) throw err;
+			res.send(200, {redirect: '/search'});
+		});
+	}
+});
 
 app.get("/posts/:id", (req, res) => {
 	let pid = req.params.id;

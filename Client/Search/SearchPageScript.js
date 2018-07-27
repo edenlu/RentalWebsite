@@ -24,7 +24,7 @@ function search() {
 				res.forEach(post => {
 					context = {
 						title: post.postTitle,
-						thumbnailSrc: "http://localhost:8080/images/question-mark.jpg",
+						thumbnailSrc: `http://localhost:8080/images/${post.iname}`,
 						postlink: `http://localhost:8080/posts/${post.pid}`,
 						price: post.price,
 						size: post.size
