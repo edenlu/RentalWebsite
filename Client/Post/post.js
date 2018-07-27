@@ -20,6 +20,18 @@ function sendCommentRequest() {
     });
 }
 
+function checkSession(handler) {
+	$.ajax({
+		type: 'GET',
+		url: 'http://localhost:8080/checkSession',
+		success: function(res) {
+            if (res.isFrozen) {
+                $("#comment").prop('disabled', true);
+                $('#replyBtn').prop('disabled', true);
+            }
+        }
+	});
+}
 function createComment() {
     if ($("#comment").val() == "") {
         $("#warning").show();
@@ -35,4 +47,6 @@ $(function() {
     $("#replyBtn").click(function() {
         createComment();
     });
+    // check account is frozen or not
+    checkSession();
 });

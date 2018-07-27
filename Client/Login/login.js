@@ -1,7 +1,7 @@
 function login() {
 	/*parse the sentence here*/
-    let username = $("input[name=username]").val();
-    let password = $("input[name=password]").val();
+    let username = $("#loginModal input[name=username]").val();
+    let password = $("#loginModal input[name=password]").val();
     let data = {
         "username": username,
         "password": password

@@ -140,11 +140,17 @@ app.get("/checkSession", (req, res) => {
 				if (!(data[0].avatarName)) {
 					data[0].avatarName = 'default.png';
 				}
-				sql =  `SELECT * FROM administer where aid = '${req.session.user}'`;
+				sql =  `SELECT * FROM administer where aid = ${req.session.user}`;
 				con.query(sql, function (err, result) {
 					if (err) throw err;
 					if (result.length === 1) data[0].isAdmin = true;
-					res.send(200, data[0]);
+
+					sql =  `select * from frozenAccount where aid = ${req.session.user}`;
+					con.query(sql, function (err, accounts) {
+						if (err) throw err;
+						if (accounts.length === 1) data[0].isFrozen = true;
+						res.send(200, data[0]);
+					});
 				});
 			}
 		});
@@ -156,6 +162,62 @@ app.get("/checkSession", (req, res) => {
 // Profile
 app.get("/profile", (req, res) => {
 	res.sendFile(__dirname + '/Client/Profile/Profile.html');
+});
+
+// get friends
+app.get("/friends", (req, res) => {
+	if (!req.session.user || !req.cookies.user_sid) {
+		res.send(200, 'not login yet!');
+		return;
+	}
+
+	let sql = `select * from friends where friendIDA = ${req.session.user} or friendIDB = ${req.session.user}`;
+	con.query(sql, function (err, result) {
+		if (err) throw err;
+		let data = result.map(friendship => {
+			if (friendship.friendIDA === req.session.user) return friendship.friendIDB;
+			return friendship.friendIDA;
+		});
+
+		if (data.length === 0) {
+			res.send(200, 'you have no frineds yet...');
+			return;
+		}
+		
+		// get alll user friends name and email
+		sql = `select username, email from account where${data.map(aid => ' aid = '+ aid).join(" or ")}`;
+		con.query(sql, function(err, friends) {
+			if (err) throw err;
+			res.send(200, friends);
+		})
+	});
+});
+
+// add friends
+app.post("/addFriend", (req, res) => {
+	if (!req.session.user || !req.cookies.user_sid) {
+		res.send(200, 'not login yet!');
+		return;
+	}
+
+	let friendCode = req.body.friendCode;
+	let sql = `select aid from account where friendCode = '${friendCode}'`;
+	con.query(sql, function(err, people) {
+		if (err) throw err;
+		if (people.length === 0) {
+			res.send(200, "not friend found with this code!");
+		} else {
+			let friendID = people[0].aid;
+			sql = `insert into friends values(${req.session.user}, ${friendID})`;
+			con.query(sql, function(err, result) {
+				if (err) {
+					res.send(200, err);
+				} else {
+					res.send(200, "New friend added!");
+				}
+			});
+		}
+	});
 });
 
 // Admin page
@@ -185,6 +247,17 @@ app.post("/admin", (req, res) => {
 			else
 				res.send(200, result);
 		});
+	});
+});
+
+// Freeze Account
+app.post("/freezeAccount", (req, res) => {
+	let sql = `insert into frozenAccount values (${req.body.freezeAccount})`;
+	con.query(sql, function (err, result) {
+		if (err)
+			res.send(200, err)
+		else
+			res.send(200, result);
 	});
 });
 

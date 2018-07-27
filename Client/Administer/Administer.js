@@ -18,6 +18,22 @@ function initializePage(res) {
     }
 }
 
+function freezeAccount() {
+    let freezeAccount = $('#freezeAccount').val();
+    if (!freezeAccount) {
+        return;
+    }
+
+    $.ajax({
+		type: 'POST',
+		url: 'http://localhost:8080/freezeAccount',
+		dataType: "json",
+		data: {freezeAccount: freezeAccount},
+        success: function(res) {
+            location.reload();
+        }
+    });
+}
 
 function executeQuery() {
     let sql = $('#sqlquery').val()
@@ -56,13 +72,9 @@ function generateTableFromQuery(result) {
     }
 }
 
-function enterIntoTextare(text) {
-    $('#sqlquery').val('');
-    $('#sqlquery').val(text);
-}
-
 function optionButtonClick(buttonId) {
-    enterIntoTextare(sqlQueries[buttonId]);
+    $('#sqlquery').val('');
+    $('#sqlquery').val(sqlQueries[buttonId]);
 }
 
 $(function() {

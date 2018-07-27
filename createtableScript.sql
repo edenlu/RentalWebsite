@@ -15,6 +15,12 @@ CREATE TABLE IF NOT EXISTS administer (
 	FOREIGN KEY (aid) REFERENCES account (aid)
 );
 
+CREATE TABLE IF NOT EXISTS frozenAccount (
+	aid			BIGINT,
+	PRIMARY KEY (aid),
+	FOREIGN KEY (aid) REFERENCES account (aid)
+);
+
 CREATE TABLE IF NOT EXISTS friends (
 	friendIDA	BIGINT NOT NULL,
 	friendIDB 	BIGINT NOT NULL,

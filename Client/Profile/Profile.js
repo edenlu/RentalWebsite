@@ -26,10 +26,57 @@ function profileHandler(res) {
         if (res.friendCode) {
             addEditableElement("friendCode", res.friendCode);
         }
+        // Generate friend list
+        generateFriendList();
     } else {
         $('.profile').empty();
-        $('.profile').append('<label style="font-size: 20px;">Requires Login to view profile</label>')
+        $('.profile').append('<label style="font-size: 20px;">Requires Login to view profile</label>');
     }
+}
+
+function generateFriendList() {
+    // Add Friend control
+    $(".profile .infoList").append(`<div id="friends" class='attribute'>
+        <div>
+            <input type="text" class="form-control" id="newFriend" placeholder="Enter friend code here to add friend">
+            <button type="button" class="btn btn-success addFriend" onclick="addNewFriend();"> Add Friend</button>
+        </div>
+    </div>`);
+
+    // Generate friend list
+	$.ajax({
+		type: 'GET',
+		url: 'http://localhost:8080/friends',
+		success: function(friends) {
+            // check if is array, otherwise print error
+            if (!Array.isArray(friends)) {
+                console.log(friends);
+                return;
+            }
+            // Append body to table
+            let bodyHtml = friends.map(friend => {
+                let newbodyRow = Object.keys(friend).map(key => `<td>${friend[key]}</td>`).join('');
+                return `<tr>${newbodyRow}</tr>`;
+            }).join('');
+            $(".profile .infoList #friends").prepend(`
+                <label id="label">Friends:</label>
+                <table class="table table-bordered"><tbody>${bodyHtml}</tbody></table>`);
+        }
+	});
+}
+
+function addNewFriend() {
+    let friendCode = $('#newFriend').val();
+	$.ajax({
+        type: 'POST',
+        dataType: "json",
+		data: {friendCode: friendCode},
+        url: 'http://localhost:8080/addFriend',
+        success: function(res) {
+            console.log(res);
+            location.reload();
+        }
+	});
 }
 
 function requestProfileChange(attibuteKey, attribtueValue, handler) {
