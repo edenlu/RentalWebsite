@@ -32,6 +32,9 @@ body {
 .commentContainer p {
   color: #333;
 }
+.newCommentContainer {
+  height: 200px;
+}
 textarea {
   float: left;
   height: 150px;
