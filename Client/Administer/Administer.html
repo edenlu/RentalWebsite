@@ -19,8 +19,9 @@
                 <label>Query</label>
                 <div id='sqloptions'>
                     <button type="button" class="btn btn-primary" id="reply_all_post"> Division - Who reply all post</button>
-                    <button type="button" class="btn btn-primary" id="average_price"> Aggregation - Average Price</button>
-                    <button type="button" class="btn btn-primary" id="post_below_average"> Nested - House that below average price</button>
+                    <button type="button" class="btn btn-primary" id="post_below_average"> Nested - House below average price</button>
+                    <button type="button" class="btn btn-primary" id="average_price"> Average Price</button>
+                    <button type="button" class="btn btn-primary" id="below_average_by_city"> House below average price by City</button>
                 </div>
                 <textarea class="form-control" rows="10" id="sqlquery" placeholder="Enter SQL query to obtain information"></textarea>
             </div>
@@ -33,8 +34,13 @@
             </div>
             <div class="contentBlock">
                 <label>Account Freeze Control</label>
-                <input type="text" class="form-control" id="freezeAccount" placeholder="Enter the account you want to freeze">
+                <input type="text" class="form-control" id="freezeAccount" placeholder="Enter the account id you want to freeze">
                 <button type="button" class="btn btn-success freeze" onclick="freezeAccount();"> Freeze</button>
+            </div>
+            <div class="contentBlock">
+                <label>Delete Post</label>
+                <input type="text" class="form-control" id="deletePost" placeholder="Enter the post id you want to delete">
+                <button type="button" class="btn btn-danger delete" onclick="deletePost();"> Delete</button>
             </div>
 		</div>
     </div>

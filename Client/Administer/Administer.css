@@ -26,11 +26,10 @@ html, body {
     font-size: 20px;
 }
 
-.administerContent #sqloptions,
 .administerContent .contentBlock {
     margin-bottom: 5px;
 }
 
-.administerContent .freeze {
-    margin-top: 5px;
+.administerContent button {
+    margin: 5px;
 }

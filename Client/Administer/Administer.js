@@ -28,7 +28,24 @@ function freezeAccount() {
 		type: 'POST',
 		url: 'http://localhost:8080/freezeAccount',
 		dataType: "json",
-		data: {freezeAccount: freezeAccount},
+		data: {aid: freezeAccount},
+        success: function(res) {
+            location.reload();
+        }
+    });
+}
+
+function deletePost() {
+    let deletePost = $('#deletePost').val();
+    if (!deletePost) {
+        return;
+    }
+
+    $.ajax({
+		type: 'POST',
+		url: 'http://localhost:8080/deletePost',
+		dataType: "json",
+		data: {pid: deletePost},
         success: function(res) {
             location.reload();
         }
@@ -75,6 +92,7 @@ function generateTableFromQuery(result) {
 function optionButtonClick(buttonId) {
     $('#sqlquery').val('');
     $('#sqlquery').val(sqlQueries[buttonId]);
+    executeQuery();
 }
 
 $(function() {
@@ -93,19 +111,25 @@ $(function() {
 
 var sqlQueries = {}
 sqlQueries['reply_all_post'] = `
-select a.aid, a.username
-from account a
-where NOT EXISTS
-(select p.pid from post p
-where NOT EXISTS
-(select * from comment c where c.pid=p.pid and c.aid=a.aid));`;
+SELECT a.aid, a.username
+FROM account a
+WHERE NOT EXISTS
+(SELECT p.pid FROM post p
+WHERE NOT EXISTS
+(SELECT * FROM comment c WHERE c.pid=p.pid and c.aid=a.aid));`;
 
 sqlQueries['post_below_average'] = `
-select p.pid, p.postTitle, r1.price
-from post p, rentoutpost r1
-where p.pid = r1.pid and r1.price < (select avg(r2.price)
-                                    from rentoutpost r2)`;
+SELECT p.pid, p.postTitle, r1.price
+FROM post p, rentoutpost r1
+WHERE p.pid = r1.pid and r1.price < (SELECT AVG(r2.price)
+FROM rentoutpost r2)`;
 
 sqlQueries['average_price'] = `
-select avg(r2.price) as averagePrice
-from rentoutpost r2`;
+SELECT avg(r2.price) as averagePrice
+FROM rentoutpost r2`;
+
+sqlQueries['below_average_by_city'] = `
+SELECT city, AVG(price) 
+FROM rentoutpost
+GROUP BY city
+`

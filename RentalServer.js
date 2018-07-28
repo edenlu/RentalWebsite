@@ -263,9 +263,20 @@ app.post("/admin", (req, res) => {
 	});
 });
 
+// Delete Post
+app.post("/deletePost", (req, res) => {
+	let sql = `delete from post where pid = (${req.body.pid})`;
+	con.query(sql, function (err, result) {
+		if (err)
+			res.send(200, err)
+		else
+			res.send(200, result);
+	});
+});
+
 // Freeze Account
 app.post("/freezeAccount", (req, res) => {
-	let sql = `insert into frozenAccount values (${req.body.freezeAccount})`;
+	let sql = `insert into frozenAccount values (${req.body.aid})`;
 	con.query(sql, function (err, result) {
 		if (err)
 			res.send(200, err)
@@ -391,29 +402,37 @@ app.get("/posts/:id", (req, res) => {
 	let sql = `SELECT * FROM Post where pid = '${pid}'`;
   
 	con.query(sql, function(err, post) {
+	  if (err) throw err;
+	  let aid = post[0].aid;
+	  sql = `SELECT username FROM Account WHERE aid = '${aid}'`;
+	  con.query(sql, function(err, username) {
 		if (err) throw err;
-		let aid = post[0].aid;
-		sql = `SELECT username FROM Account WHERE aid = '${aid}'`;
-		con.query(sql, function(err, username) {
+		sql = `SELECT * FROM Comment WHERE pid = '${pid}' ORDER BY commentDate`;
+		con.query(sql, function(err, comments) {
+		  if (err) throw err;
+		  sql = `SELECT * FROM RentOutPost WHERE pid = '${pid}'`;
+		  con.query(sql, function(err, RentOutPost) {
 			if (err) throw err;
-			sql = `SELECT * FROM Comment WHERE pid = '${pid}' ORDER BY commentDate`;
-			con.query(sql, function(err, comments) {
-				if (err) throw err;
-				sql = `SELECT * FROM RentOutPost WHERE pid = '${pid}'`;
-				con.query(sql, function(err, RentOutPost) {
-					console.log(RentOutPost[0]);
-					if (err) throw err;
-					res.render("post", {
-						post: post[0],
-						username: username[0],
-						comments: comments,
-						RentOutPost: RentOutPost
-					});
-				});
+			sql = `SELECT * FROM Image WHERE pid = '${pid}'`;
+			con.query(sql, function(err, postImage) {
+			  if (err) throw err;
+			  let imageName = "";
+			  if (postImage.length > 0) {
+				  imageName = postImage[0].iname;
+			  }
+			  res.render("post", {
+				post: post[0],
+				username: username[0],
+				comments: comments,
+				RentOutPost: RentOutPost,
+				postImage: imageName
+			  });
 			});
+		  });
 		});
+	  });
 	});
-});
+  });
   
 app.post("/posts/:id", (req, res) => {
 	if (!req.session.user || !req.cookies.user_sid) {
