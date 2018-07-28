@@ -99,7 +99,9 @@ app.post("/search", (req, res) => {
 			if (err) throw err;
 			imageInfo.forEach(function(singleImageInfo) {
 				let matchPost = result.find((item) => item.pid == singleImageInfo.pid);
-				matchPost.iname = singleImageInfo.iname;
+				if (matchPost) {
+					matchPost.iname = singleImageInfo.iname;
+				}
 			});
 			res.send(result);
 		});
