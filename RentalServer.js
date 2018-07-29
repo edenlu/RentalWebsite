@@ -302,7 +302,7 @@ app.post("/changeProfile", (req, res) => {
 });
 
 // Upload Image
-app.post("/uploadUserAvatar", upload.array('userIcon'), (req, res) => {
+app.post("/uploadUserAvatar", upload.single('userIcon'), (req, res) => {
 	if (req.session.user && req.cookies.user_sid) {
 		let sql = `UPDATE account set avatarName = '${req.file.filename}'where aid = '${req.session.user}'`;
 		con.query(sql, function (err, result) {
