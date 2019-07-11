@@ -21,3 +21,20 @@
 2. Now the website is available at http://localhost:8080/search/
 
 P.S. for debuging the server, you may use Visual Studio Code
+
+# Features
+## Homepage
+![Home](PresentationImages/HomePage.PNG?raw=true "Home" width=500)
+
+## Login
+![Login](PresentationImages/Login.gif "Login" width=500)
+
+## Profile
+![Profile](PresentationImages/Profile.gif?raw=true "Profile" width=500)
+
+## Create house renting post
+![Create post](PresentationImages/CreatePost.gif "Post" width=500)
+
+## Search
+Search housing by price and locations!
+![Search](PresentationImages/Search.gif "Search" width=500)

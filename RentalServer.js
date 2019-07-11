@@ -23,12 +23,20 @@ var port = 8080;
 console.log("The port is set at: " + port);
 
 // Database connection
+// var con = mysql.createConnection({
+	// //Maximum 100 concurrent query
+	// connectLimit: 100,
+	// host: "localhost",
+	// user: "root",
+	// password: "root",
+	// database: "rent_cmpt354"
+// });
 var con = mysql.createConnection({
 	//Maximum 100 concurrent query
 	connectLimit: 100,
 	host: "localhost",
 	user: "root",
-	password: "root",
+	password: "a13246529",
 	database: "rent_cmpt354"
 });
 
