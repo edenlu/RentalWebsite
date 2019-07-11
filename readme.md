@@ -24,17 +24,17 @@ P.S. for debuging the server, you may use Visual Studio Code
 
 # Features
 ## Homepage
-<img src="PresentationImages/HomePage.PNG" width="500">
+<img src="PresentationImages/HomePage.PNG" width="800">
 
 ## Login
-<img src="PresentationImages/Login.gif" width="500">
+<img src="PresentationImages/Login.gif" width="800">
 
 ## Profile
-<img src="PresentationImages/Profile.gif" width="500">
+<img src="PresentationImages/Profile.gif" width="800">
 
 ## Create house renting post
-<img src="PresentationImages/CreatePost.gif" width="500">
+<img src="PresentationImages/CreatePost.gif" width="800">
 
 ## Search
+<img src="PresentationImages/Search.gif" width="800">
 Search housing by price and locations!
-<img src="PresentationImages/Search.gif" width="500">
